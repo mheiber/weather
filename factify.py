@@ -1,33 +1,26 @@
 from csv_to_json import *
 from collections import OrderedDict
 
-fact_rows=csv_to_list_of_dicts('./201503daily.csv')
-zip_codes=csv_to_list_of_dicts('./closer2.csv')
 
 
-out_rows=[]
+def factify(fact_file,closest_wbans_file,out_file):
 
-for fact_row in fact_rows:
-	out_row=OrderedDict()
-	print fact_row
-	for zip_code in zip_codes:
-		if zip_code['closest_wban']==fact_row['WBAN']:
-			for key in fact_row.keys():
-				out_row[key]=fact_row[key]
-			out_row['zip']=zip_code['zip']
-			print out_row,'\n\n'
-			out_rows.append(out_row)
+	fact_rows=csv_to_list_of_dicts(fact_file)
+	zip_codes=csv_to_list_of_dicts(closest_wbans_file)
 
+	out_rows=[]
+	length=len(fact_rows)
 
-# for zip_code in zip_codes:
-# 	out_row=OrderedDict()
-# 	out_row['zip']=zip_code['zip']
-# 	for fact_row in fact_rows:
-# 		if fact_row['WBAN']==zip_code['closest_wban']:
-# 			for key in fact_row.keys():
-# 				out_row[key]=fact_row[key]
-# 			out_rows.append(out_row)
-# 			break
+	for row_num,fact_row in enumerate(fact_rows):
 
-list_of_dicts_to_csv(out_rows,'facts3.csv')
-print 'done'
+		for zip_code in zip_codes:
+			if zip_code['closest_wban_id']==fact_row['WBAN']:
+				out_row=OrderedDict()
+				out_row['zip']=zip_code['zip']
+				for key in fact_row.keys():
+					out_row[key]=fact_row[key]
+				out_rows.append(out_row)
+		print row_num,row_num*1.0/length
+
+	list_of_dicts_to_csv(out_rows,out_file)
+	print 'wrote to '+out_file
